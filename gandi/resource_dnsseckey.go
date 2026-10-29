@@ -111,8 +111,9 @@ func resourceDNSSECKeyRead(d *schema.ResourceData, meta interface{}) (err error)
 		}
 	}
 	if !matchedKey {
-		err = fmt.Errorf("Cannot find DNSSEC key %s for domain %s", id, resDomain)
-		return
+		// Gandi removes the keys when the nameservers change
+		d.SetId("")
+		return nil
 	}
 
 	if err = d.Set("algorithm", found.Algorithm); err != nil {
