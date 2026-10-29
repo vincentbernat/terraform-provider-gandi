@@ -111,6 +111,18 @@ func resourceDNSSECKeyRead(d *schema.ResourceData, meta interface{}) (err error)
 		}
 	}
 	if !matchedKey {
+		// The key may have been created again with another ID
+		publicKey := d.Get("public_key").(string)
+		for _, k := range keys {
+			if publicKey != "" && k.PublicKey == publicKey {
+				found = k
+				matchedKey = true
+				d.SetId(strconv.Itoa(k.ID))
+				break
+			}
+		}
+	}
+	if !matchedKey {
 		// Gandi removes the keys when the nameservers change
 		d.SetId("")
 		return nil
